@@ -18,7 +18,7 @@ I built the first version in **Lovable** and then refined it by hand. I'm transp
 
 What Lovable handled: scaffolding, responsive layout, component structure, deploy.
 
-What I owned: everything that actually makes the page convert — the story, the order, the offer, and the words. I also handled the pieces around the build: buying the domain through **GoDaddy** and wiring up the third-party **integrations via connectors** (Google Calendar, Stripe) so booking and payments work end to end.
+What I owned: everything that actually makes the page convert — the story, the order, the offer, and the words. I also handled the pieces around the build: buying the domain through **GoDaddy** and wiring up the third-party **integrations via connectors** (Google Calendar, Gmail, Google Sheets, Stripe) so booking, notifications, and payments work end to end.
 
 ## Product decisions I made
 
@@ -53,6 +53,20 @@ The booking journey is intentionally short and self-contained:
 
 This removes the manual back-and-forth that usually happens on mentoring platforms and gives me full ownership of the relationship.
 
+## Custom scope requests (partnership form)
+
+Alongside the three bookable offers, the site has a fourth, price-less **"Custom scope / Long-term Partnership"** offer. Instead of Stripe, its CTA — *"Submit request"* — opens a dedicated `/partnership` page styled like the booking page: context and expectations on the left, a short form on the right (Full name · Email · "How can I help you?", all required).
+
+Instead of relying on a Google Form embed, submissions are handled natively and fanned out to two Google channels via connectors:
+
+1. The request is validated (Zod) and stored in the database.
+2. A notification **email lands in my Gmail** (`rhaissavitor@gmail.com`), with the requester's address as Reply-To so I can answer in one click.
+3. The same request is **appended as a row in a Google Sheet** — giving me the structured, exportable list of answers a Google Form would have produced, without sending visitors to an external form.
+
+The visitor always sees the confirmation once the request is saved; notification issues are logged on my side instead of being shown to them, so a saved lead never looks lost.
+
+Why this way: I get the exact workflow I wanted from Google Forms (collect + review answers from my Gmail account) while keeping the visitor on my own site, in my design system, bilingual.
+
 ## Project structure
 
 ```
@@ -72,6 +86,8 @@ src/
 - **Tailwind CSS v4** + **shadcn/ui** components
 - **Lovable Cloud** — backend, auth, and database (Supabase under the hood)
 - **Google Calendar API** — availability checks and event creation
+- **Gmail** — notification emails for custom scope requests (sent from my own account)
+- **Google Sheets** — every custom scope request logged as a row, replacing a Google Form
 - **Stripe** — payment checkout (USD / BRL)
 - **Lovable email domain** — confirmation emails
 
